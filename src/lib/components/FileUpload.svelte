@@ -10,13 +10,18 @@
 	let fileInput = $state<HTMLInputElement>();
 	let selectedFile = $state<File | null>(null);
 	let isProcessing = $state(false);
+	let error = $state<string | null>(null);
+	let retryCount = $state(0);
+	let lastError = $state<Error | null>(null);
 
 	// Constants for messages and validation
 	const MESSAGES = {
 		INVALID_FILE_TYPE: 'Please select a CSV file.',
 		FILE_TOO_LARGE: 'File size must be less than 10MB.',
-		PROCESSING_FAILED: 'Failed to process file',
 		UNKNOWN_ERROR: 'Unknown error occurred',
+		PROCESSING_FAILED: 'Failed to process file',
+		SERVER_ERROR: 'Server error. Please try again later.',
+		VALIDATION_ERROR: 'File validation failed',
 		PROCESSING_STATUS: 'Processing CSV file...',
 		FILE_SELECTED: 'File Selected',
 		SELECT_CSV_FILE: 'Select CSV File',
@@ -25,12 +30,13 @@
 		PROCESSING_BUTTON: 'Processing...',
 		PROCESS_FILE_BUTTON: 'Process File',
 		CLEAR_BUTTON: 'Clear',
-		DROP_FILE_HERE: 'Drop your CSV file here',
 		EXPECTED_FORMAT: 'Expected CSV Format:',
 		MONITORING_LOCATION_DESC: 'MonitoringLocationID: Unique identifier for each monitoring site',
 		CHARACTERISTIC_NAME_DESC: 'CharacteristicName: Must include "Temperature, water" entries',
 		RESULT_VALUE_DESC: 'ResultValue: Numeric temperature values',
-		CALCULATION_INFO: 'The application will calculate the average temperature for each monitoring location where the characteristic is "Temperature, water".'
+		CALCULATION_INFO: 'The application will calculate the average temperature for each monitoring location where the characteristic is "Temperature, water".',
+		RETRY_BUTTON: 'Retry',
+		ERROR_TITLE: 'Upload Error'
 	};
 
 	const VALIDATION = {
@@ -40,8 +46,10 @@
 
 	/**
 	 * Validates a file for type and size requirements
-	 * @param file - File object to validate
-	 * @returns Object with isValid boolean and error message if invalid
+	 * Checks file extension and size to ensure it meets application requirements
+	 * 
+	 * @param {File} file - File object to validate
+	 * @returns {{isValid: boolean, error?: string}} Object with isValid boolean and error message if invalid
 	 */
 	function validateFile(file: File): { isValid: boolean; error?: string } {
 		// Check file extension
@@ -60,8 +68,10 @@
 
 	/**
 	 * Handles file input change events from file picker
-	 * Processes selected files from file input
-	 * @param event - Input change event from file input element
+	 * Processes selected files from file input element and triggers file selection
+	 * 
+	 * @param {Event} event - Input change event from file input element
+	 * @returns {void}
 	 */
 	function handleFileInputChange(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -73,8 +83,10 @@
 
 	/**
 	 * Validates and processes a selected file
-	 * Uses consolidated validation function
-	 * @param file - File object to validate and process
+	 * Uses consolidated validation function to check file requirements
+	 * 
+	 * @param {File} file - File object to validate and process
+	 * @returns {void}
 	 */
 	function handleFileSelection(file: File) {
 		const validation = validateFile(file);
@@ -88,47 +100,139 @@
 	}
 
 	/**
+	 * Gets error message from error object
+	 * 
+	 * @param {unknown} err - The error that occurred
+	 * @returns {string} Error message
+	 */
+	function getErrorMessage(err: unknown): string {
+		return err instanceof Error ? err.message : MESSAGES.UNKNOWN_ERROR;
+	}
+
+	/**
+	 * Uploads file to the API
+	 * 
+	 * @param {File} file - The file to upload
+	 * @returns {Promise<Response>} The API response
+	 */
+	async function uploadFile(file: File): Promise<Response> {
+		const formData = new FormData();
+		formData.append('csvFile', file);
+
+		return await fetch('/api/process-csv', {
+			method: 'POST',
+			body: formData
+		});
+	}
+
+	/**
+	 * Handles API response errors
+	 * 
+	 * @param {Response} response - The API response
+	 * @returns {Promise<string>} Error message
+	 */
+	async function handleApiResponse(response: Response): Promise<string> {
+		let errorMessage = MESSAGES.PROCESSING_FAILED;
+		
+		try {
+			const errorData = await response.json();
+			errorMessage = errorData.error || errorMessage;
+		} catch {
+			// If we can't parse the error response, use status-based messages
+			if (response.status >= 500) {
+				errorMessage = MESSAGES.SERVER_ERROR;
+			} else if (response.status === 413) {
+				errorMessage = MESSAGES.FILE_TOO_LARGE;
+			} else if (response.status === 400) {
+				errorMessage = MESSAGES.VALIDATION_ERROR;
+			}
+		}
+		
+		return errorMessage;
+	}
+
+	/**
+	 * Resets form state after successful processing
+	 */
+	function resetFormState(): void {
+		selectedFile = null;
+		error = null;
+		retryCount = 0;
+		lastError = null;
+		if (fileInput) fileInput.value = '';
+	}
+
+	/**
+	 * Handles processing errors
+	 * 
+	 * @param {unknown} err - The error that occurred
+	 */
+	function handleProcessingError(err: unknown): void {
+		const errorMessage = getErrorMessage(err);
+		error = errorMessage;
+		lastError = err instanceof Error ? err : new Error(String(err));
+		onerror(errorMessage);
+	}
+
+	/**
 	 * Processes the selected CSV file by sending it to the API
-	 * Handles the complete upload and processing workflow
-	 * @returns Promise that resolves when processing is complete
+	 * 
+	 * @returns {Promise<void>} Promise that resolves when processing is complete
 	 */
 	async function processFile() {
 		if (!selectedFile) return;
 
 		isProcessing = true;
+		error = null;
 		onprocessingstart();
 
 		try {
-			const formData = new FormData();
-			formData.append('csvFile', selectedFile);
-
-			const response = await fetch('/api/process-csv', {
-				method: 'POST',
-				body: formData
-			});
+			const response = await uploadFile(selectedFile);
 
 			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || MESSAGES.PROCESSING_FAILED);
+				const errorMessage = await handleApiResponse(response);
+				throw new Error(errorMessage);
 			}
 
 			const results = await response.json();
 			onfileprocessed(results);
-			
-			// Reset form
-			selectedFile = null;
-			if (fileInput) fileInput.value = '';
+			resetFormState();
 
-		} catch (error) {
-			onerror(error instanceof Error ? error.message : MESSAGES.UNKNOWN_ERROR);
+		} catch (err) {
+			handleProcessingError(err);
 		} finally {
 			isProcessing = false;
 		}
 	}
 
 	/**
+	 * Retries the file processing operation
+	 * Increments retry count and attempts to process the file again
+	 * 
+	 * @returns {Promise<void>} Promise that resolves when retry is complete
+	 */
+	async function retryProcessing() {
+		retryCount++;
+		await processFile();
+	}
+
+	/**
+	 * Clears the current error state
+	 * Resets error variables and retry count to allow fresh attempts
+	 * 
+	 * @returns {void}
+	 */
+	function clearError() {
+		error = null;
+		lastError = null;
+		retryCount = 0;
+	}
+
+	/**
 	 * Clears the currently selected file
-	 * Resets both component state and file input value
+	 * Resets both component state and file input value to allow new file selection
+	 * 
+	 * @returns {void}
 	 */
 	function clearFile() {
 		selectedFile = null;
@@ -137,7 +241,9 @@
 
 	/**
 	 * Triggers the file input element
-	 * Opens the file picker dialog
+	 * Opens the file picker dialog when not processing
+	 * 
+	 * @returns {void}
 	 */
 	function triggerFileInput() {
 		if (!isProcessing) {
@@ -203,6 +309,40 @@
 			</div>
 		{/if}
 	</div>
+
+	<!-- Error Display -->
+	{#if error}
+		<div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+			<div class="flex items-start">
+				<div class="flex-shrink-0">
+					<svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+					</svg>
+				</div>
+				<div class="ml-3 flex-1">
+					<h3 class="text-sm font-medium text-red-800">{MESSAGES.ERROR_TITLE}</h3>
+					<p class="text-sm text-red-700 mt-1">{error}</p>
+					{#if retryCount < 3}
+						<div class="mt-3 flex space-x-3">
+							<button
+								onclick={retryProcessing}
+								disabled={isProcessing}
+								class="text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
+							>
+								{MESSAGES.RETRY_BUTTON} ({retryCount}/3)
+							</button>
+							<button
+								onclick={clearError}
+								class="text-sm font-medium text-red-600 hover:text-red-500"
+							>
+								Dismiss
+							</button>
+						</div>
+					{/if}
+				</div>
+			</div>
+		</div>
+	{/if}
 
 	<!-- Action Buttons -->
 	{#if selectedFile}

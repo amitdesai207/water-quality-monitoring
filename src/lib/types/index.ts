@@ -1,3 +1,4 @@
+import type { Snippet } from 'svelte';
 /**
  * Props for the FileUpload component
  */
@@ -21,4 +22,26 @@ export interface ResultsDisplayProps {
 export interface TemperatureData {
 	/** Average temperature per monitoring location */
 	[locationId: string]: number;
+}
+
+/**
+ * Props for the ErrorBoundary component
+ */
+export interface ErrorBoundaryProps {
+	children?: Snippet;
+	fallback?: Snippet;
+	onError?: (error: Error, errorInfo: any) => void;
+	title?: string;
+	message?: string;
+	onRetry?: () => void;
+}
+
+/**
+ * Props for the ErrorFallback component
+ */
+export interface ErrorFallbackProps {
+	title?: string;
+	message?: string;
+	onRetry?: () => void;
+	children?: Snippet;
 }

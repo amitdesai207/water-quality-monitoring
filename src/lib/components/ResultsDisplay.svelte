@@ -20,14 +20,11 @@
 		LOCATION_HEADER: 'Monitoring Location',
 		TEMPERATURE_HEADER: 'Average Temperature (°C)',
 		VISUALIZATION_HEADER: 'Temperature Range',
-		EXPORT_BUTTON: 'Export CSV',
 		TOTAL_LOCATIONS: 'Total Locations',
 		AVERAGE_TEMPERATURE: 'Average Temperature',
 		MIN_TEMPERATURE: 'Minimum Temperature',
 		MAX_TEMPERATURE: 'Maximum Temperature',
 		NO_RESULTS: 'No locations match your search.',
-		CSV_FILENAME: 'water-quality-results.csv',
-		CSV_HEADER: 'MonitoringLocationID,AverageTemperature',
 		TEMPERATURE_UNIT: '°C',
 		LEGEND_TITLE: 'Temperature Range:',
 		LEGEND_COLD: 'Cold',
@@ -44,9 +41,11 @@
 
 	/**
 	 * Validates search term and filters results
-	 * @param term - Search term to validate and use for filtering
-	 * @param data - Results data to filter
-	 * @returns Filtered results array
+	 * Filters temperature data based on location name matching the search term
+	 * 
+	 * @param {string} term - Search term to validate and use for filtering
+	 * @param {TemperatureData} data - Results data to filter
+	 * @returns {[string, number][]} Filtered results array
 	 */
 	function filterResults(term: string, data: TemperatureData): [string, number][] {
 		const cleanTerm = term.trim().toLowerCase();
@@ -57,10 +56,12 @@
 
 	/**
 	 * Sorts results based on field and direction
-	 * @param data - Filtered results to sort
-	 * @param field - Field to sort by
-	 * @param direction - Sort direction
-	 * @returns Sorted results array
+	 * Sorts the filtered results array by location or temperature in ascending or descending order
+	 * 
+	 * @param {[string, number][]} data - Filtered results to sort
+	 * @param {'location' | 'temperature'} field - Field to sort by
+	 * @param {'asc' | 'desc'} direction - Sort direction
+	 * @returns {[string, number][]} Sorted results array
 	 */
 	function sortResults(
 		data: [string, number][], 
@@ -80,8 +81,10 @@
 
 	/**
 	 * Calculates temperature statistics
-	 * @param values - Array of temperature values
-	 * @returns Statistics object with average, min, max
+	 * Computes average, minimum, and maximum values from temperature data
+	 * 
+	 * @param {number[]} values - Array of temperature values
+	 * @returns {{average: number, min: number, max: number}} Statistics object with average, min, max
 	 */
 	function calculateStats(values: number[]) {
 		if (values.length === 0) {
@@ -97,7 +100,10 @@
 
 	/**
 	 * Toggles sort direction for the specified field
-	 * @param field - The field to sort by ('location' or 'temperature')
+	 * Changes sort direction or switches to new field for sorting
+	 * 
+	 * @param {'location' | 'temperature'} field - The field to sort by ('location' or 'temperature')
+	 * @returns {void}
 	 */
 	function toggleSort(field: 'location' | 'temperature') {
 		if (sortField === field) {
@@ -108,26 +114,6 @@
 		}
 	}
 
-	/**
-	 * Exports the temperature results to a CSV file
-	 * Creates a downloadable CSV file with location IDs and average temperatures
-	 */
-	function exportResults() {
-		const csvContent = [
-			CONTENT.CSV_HEADER,
-			...Object.entries(results).map(([location, temp]) => `${location},${temp}`)
-		].join('\n');
-
-		const blob = new Blob([csvContent], { type: 'text/csv' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = CONTENT.CSV_FILENAME;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
-	}
 </script>
 
 <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -161,29 +147,19 @@
 		</div>
 	</div>
 
+
 	<!-- Controls -->
 	<div class="px-6 py-4 border-b border-gray-200">
-		<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
-			<div class="relative">
-				<input
-					type="text"
-					placeholder={CONTENT.SEARCH_PLACEHOLDER}
-					bind:value={searchTerm}
-					class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-				/>
-				<svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-				</svg>
-			</div>
-			<button
-				onclick={exportResults}
-				class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-			>
-				<svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-				</svg>
-				{CONTENT.EXPORT_BUTTON}
-			</button>
+		<div class="relative">
+			<input
+				type="text"
+				placeholder={CONTENT.SEARCH_PLACEHOLDER}
+				bind:value={searchTerm}
+				class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+			/>
+			<svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+			</svg>
 		</div>
 	</div>
 
