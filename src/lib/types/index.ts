@@ -25,6 +25,14 @@ export interface TemperatureData {
 }
 
 /**
+ * Temperature table row structure for DataTable component
+ */
+export interface TemperatureTableRow {
+	location: string;
+	temperature: number;
+}
+
+/**
  * Props for the ErrorBoundary component
  */
 export interface ErrorBoundaryProps {
@@ -44,4 +52,33 @@ export interface ErrorFallbackProps {
 	message?: string;
 	onRetry?: () => void;
 	children?: Snippet;
+}
+
+// Temperature DataTable component types
+export type SortDirection = 'asc' | 'desc';
+export type TemperatureSortField = 'location' | 'temperature';
+
+/**
+ * Props for the temperature-specific DataTable component
+ */
+export interface TemperatureDataTableProps {
+	data: TemperatureTableRow[];
+	searchable?: boolean;
+	sortable?: boolean;
+	paginated?: boolean;
+	itemsPerPage?: number;
+	loading?: boolean;
+	emptyMessage?: string;
+	searchPlaceholder?: string;
+	onRowClick?: (row: TemperatureTableRow, index: number) => void;
+}
+
+/**
+ * Internal state for the temperature DataTable component
+ */
+export interface TemperatureTableState {
+	sortField: TemperatureSortField;
+	sortDirection: SortDirection;
+	searchTerm: string;
+	currentPage: number;
 }

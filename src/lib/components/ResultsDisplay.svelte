@@ -1,17 +1,28 @@
 <script lang="ts">
-	import type { ResultsDisplayProps, TemperatureData } from '$lib/types';
+	import type { ResultsDisplayProps, TemperatureData, TemperatureTableRow } from '$lib/types';
+	import DataTable from './DataTable.svelte';
 
 	let { results }: ResultsDisplayProps = $props();
 
-	let sortField = $state<'location' | 'temperature'>('location');
-	let sortDirection = $state<'asc' | 'desc'>('asc');
-	let searchTerm = $state('');
-
-	let filteredResults = $derived(filterResults(searchTerm, results));
-	let sortedResults = $derived(sortResults(filteredResults, sortField, sortDirection));
 	let totalLocations = $derived(Object.keys(results).length);
 	let values = $derived(Object.values(results));
 	let stats = $derived(calculateStats(values));
+
+	// Convert TemperatureData to array format for DataTable
+	let tableData = $derived(convertToTableData(results));
+
+	/**
+	 * Converts TemperatureData object to array of TemperatureTableRow for DataTable
+	 * 
+	 * @param {TemperatureData} data - Temperature data object
+	 * @returns {TemperatureTableRow[]} Array of table rows
+	 */
+	function convertToTableData(data: TemperatureData): TemperatureTableRow[] {
+		return Object.entries(data).map(([location, temperature]) => ({
+			location,
+			temperature
+		}));
+	}
 
 	// Content text constants
 	const CONTENT_TEXT = {
@@ -39,45 +50,7 @@
 		WARM_THRESHOLD: 25,
 	};
 
-	/**
-	 * Validates search term and filters results
-	 * Filters temperature data based on location name matching the search term
-	 * 
-	 * @param {string} term - Search term to validate and use for filtering
-	 * @param {TemperatureData} data - Results data to filter
-	 * @returns {[string, number][]} Filtered results array
-	 */
-	function filterResults(term: string, data: TemperatureData): [string, number][] {
-		const cleanTerm = term.trim().toLowerCase();
-		return Object.entries(data).filter(([location]) => 
-			location.toLowerCase().includes(cleanTerm)
-		);
-	}
 
-	/**
-	 * Sorts results based on field and direction
-	 * Sorts the filtered results array by location or temperature in ascending or descending order
-	 * 
-	 * @param {[string, number][]} data - Filtered results to sort
-	 * @param {'location' | 'temperature'} field - Field to sort by
-	 * @param {'asc' | 'desc'} direction - Sort direction
-	 * @returns {[string, number][]} Sorted results array
-	 */
-	function sortResults(
-		data: [string, number][], 
-		field: 'location' | 'temperature', 
-		direction: 'asc' | 'desc'
-	): [string, number][] {
-		return [...data].sort(([aLocation, aTemp], [bLocation, bTemp]) => {
-			let comparison = 0;
-			if (field === 'location') {
-				comparison = aLocation.localeCompare(bLocation);
-			} else {
-				comparison = aTemp - bTemp;
-			}
-			return direction === 'asc' ? comparison : -comparison;
-		});
-	}
 
 	/**
 	 * Calculates temperature statistics
@@ -98,21 +71,6 @@
 		};
 	}	
 
-	/**
-	 * Toggles sort direction for the specified field
-	 * Changes sort direction or switches to new field for sorting
-	 * 
-	 * @param {'location' | 'temperature'} field - The field to sort by ('location' or 'temperature')
-	 * @returns {void}
-	 */
-	function toggleSort(field: 'location' | 'temperature') {
-		if (sortField === field) {
-			sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-		} else {
-			sortField = field;
-			sortDirection = 'asc';
-		}
-	}
 
 </script>
 
@@ -148,21 +106,6 @@
 	</div>
 
 
-	<!-- Controls -->
-	<div class="px-6 py-4 border-b border-gray-200">
-		<div class="relative">
-			<input
-				type="text"
-				placeholder={CONTENT_TEXT.SEARCH_PLACEHOLDER}
-				bind:value={searchTerm}
-				class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-			/>
-			<svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-			</svg>
-		</div>
-	</div>
-
 	<!-- Temperature Legend -->
 	<div class="px-6 py-3 bg-gray-50 border-b border-gray-200">
 		<div class="flex items-center space-x-6 text-sm">
@@ -182,87 +125,16 @@
 		</div>
 	</div>
 
-	<!-- Results Table -->
-	<div class="overflow-x-auto">
-		<table class="min-w-full divide-y divide-gray-200">
-			<thead class="bg-gray-50">
-				<tr>
-					<th
-						class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-						onclick={() => toggleSort('location')}
-					>
-						<div class="flex items-center space-x-1">
-							<span>{CONTENT_TEXT.LOCATION_HEADER}</span>
-							{#if sortField === 'location'}
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									{#if sortDirection === 'asc'}
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-									{:else}
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-									{/if}
-								</svg>
-							{/if}
-						</div>
-					</th>
-					<th
-						class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-						onclick={() => toggleSort('temperature')}
-					>
-						<div class="flex items-center space-x-1">
-							<span>{CONTENT_TEXT.TEMPERATURE_HEADER}</span>
-							{#if sortField === 'temperature'}
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									{#if sortDirection === 'asc'}
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-									{:else}
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-									{/if}
-								</svg>
-							{/if}
-						</div>
-					</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-						{CONTENT_TEXT.VISUALIZATION_HEADER}
-					</th>
-				</tr>
-			</thead>
-			<tbody class="bg-white divide-y divide-gray-200">
-				{#each sortedResults as [location, temperature]}
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-4 whitespace-nowrap">
-							<div class="text-sm font-medium text-gray-900">{location}</div>
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap">
-							<span class="text-sm font-medium text-gray-900">
-								{temperature.toFixed(1)}{CONTENT_TEXT.TEMPERATURE_UNIT}
-							</span>
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-							<div class="flex items-center">
-								<div class="w-20 bg-gray-200 rounded-full h-2">
-									<div 
-										class="h-2 rounded-full {
-											temperature < TEMPERATURE_RANGES.COLD_THRESHOLD ? 'bg-blue-500' :
-											temperature < TEMPERATURE_RANGES.WARM_THRESHOLD ? 'bg-yellow-500' :
-											'bg-red-500'
-										}"
-										style="width: {((temperature - stats.min) / (stats.max - stats.min)) * 100}%"
-									></div>
-								</div>
-								<span class="ml-2 text-xs text-gray-500">
-									{((temperature - stats.min) / (stats.max - stats.min) * 100).toFixed(0)}{CONTENT_TEXT.PERCENTAGE_SUFFIX}
-								</span>
-							</div>
-						</td>
-					</tr>
-				{:else}
-					<tr>
-						<td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
-							{CONTENT_TEXT.NO_RESULTS}
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
+	<!-- DataTable -->
+	<div class="px-6 py-4">
+		<DataTable 
+			data={tableData}
+			searchable={true}
+			sortable={true}
+			paginated={true}
+			itemsPerPage={10}
+			searchPlaceholder={CONTENT_TEXT.SEARCH_PLACEHOLDER}
+			emptyMessage={CONTENT_TEXT.NO_RESULTS}
+		/>
 	</div>
 </div>
