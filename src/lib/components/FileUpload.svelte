@@ -37,12 +37,17 @@
 
 	const VALIDATION = {
 		MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
-		ALLOWED_EXTENSION: '.csv'
+		ALLOWED_EXTENSION: '.csv',
+		ALLOWED_MIME_TYPES: [
+			'text/csv',
+			'application/csv',
+			'text/plain'
+		]
 	};
 
 	/**
 	 * Validates a file for type and size requirements
-	 * Checks file extension and size to ensure it meets application requirements
+	 * Checks file extension, MIME type, and size to ensure it meets application requirements
 	 * 
 	 * @param {File} file - File object to validate
 	 * @returns {{isValid: boolean, error?: string}} Object with isValid boolean and error message if invalid
@@ -53,9 +58,22 @@
 			return { isValid: false, error: ERROR_MESSAGES.INVALID_FILE_TYPE };
 		}
 
+		// Check MIME type for additional security
+		if (!VALIDATION.ALLOWED_MIME_TYPES.includes(file.type)) {
+			return { 
+				isValid: false, 
+				error: `Invalid file type. Expected CSV file, got: ${file.type || 'unknown'}` 
+			};
+		}
+
 		// Check file size
 		if (file.size > VALIDATION.MAX_FILE_SIZE) {
 			return { isValid: false, error: ERROR_MESSAGES.FILE_TOO_LARGE };
+		}
+
+		// Check for empty file
+		if (file.size === 0) {
+			return { isValid: false, error: 'File is empty' };
 		}
 
 		return { isValid: true };
