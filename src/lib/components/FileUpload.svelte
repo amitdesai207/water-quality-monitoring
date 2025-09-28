@@ -34,7 +34,6 @@
 		MONITORING_LOCATION_DESC: 'MonitoringLocationID: Unique identifier for each monitoring site',
 		CHARACTERISTIC_NAME_DESC: 'CharacteristicName: Must include "Temperature, water" entries',
 		RESULT_VALUE_DESC: 'ResultValue: Numeric temperature values',
-		CALCULATION_INFO: 'The application will calculate the average temperature for each monitoring location where the characteristic is "Temperature, water".',
 		RETRY_BUTTON: 'Retry',
 		ERROR_TITLE: 'Upload Error'
 	};
@@ -74,6 +73,8 @@
 	 * @returns {void}
 	 */
 	function handleFileInputChange(event: Event) {
+		onprocessingstart();
+		clearError();
 		const target = event.target as HTMLInputElement;
 		const files = target.files;
 		if (files && files.length > 0) {
@@ -395,8 +396,5 @@
 			<li><strong>{MESSAGES.CHARACTERISTIC_NAME_DESC}</strong></li>
 			<li><strong>{MESSAGES.RESULT_VALUE_DESC}</strong></li>
 		</ul>
-		<p class="mt-4 text-xs">
-			{MESSAGES.CALCULATION_INFO}
-		</p>
 	</div>
 </div>
