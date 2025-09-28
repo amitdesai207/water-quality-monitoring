@@ -19,15 +19,15 @@
 	}: Props = $props();
 </script>
 
-<footer class="bg-gray-50 border-t border-gray-200 mt-auto">
+<footer class="custom-bg border-t border-gray-200 mt-auto">
 	<!-- Main footer content -->
 	<div class="container mx-auto px-4 py-8">
 		<!-- About section -->
 		<div>
-			<h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+			<h3 class="text-white text-sm font-semibold uppercase tracking-wider mb-4">
 				{CONTENT_TEXT.SECTION_TITLE}
 			</h3>
-			<p class="text-sm text-gray-600 leading-relaxed">
+			<p class="text-white text-sm leading-relaxed">
 				{CONTENT_TEXT.DESCRIPTION}
 			</p>
 		</div>

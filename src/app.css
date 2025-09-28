@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 
+/* Custom Styles */
+.custom-bg {
+	background-color: #0b2e44;
+}
+
 /* DataTable Component Styles */
 .datatable-container {
 	width: 100%;

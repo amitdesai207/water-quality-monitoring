@@ -20,7 +20,7 @@
 	}: Props = $props();
 </script>
 
-<header class="bg-white shadow-sm border-b border-gray-200">
+<header class="custom-bg shadow-sm border-b border-gray-200">
 	<div class="container mx-auto px-4 py-6">
 		<!-- Top section with logo -->
 		{#if showLogo}
@@ -32,11 +32,11 @@
 
 		<!-- Page title and description -->
 		<div class="text-center">
-			<h1 class="text-4xl font-bold text-gray-900 mb-4">
+			<h1 class="text-4xl font-bold text-white mb-4">
 				{title}
 			</h1>
 			{#if subtitle}
-				<p class="text-xl text-gray-600 max-w-2xl mx-auto">
+				<p class="text-xl text-gray-200 max-w-2xl mx-auto">
 					{subtitle}
 				</p>
 			{/if}

@@ -37,17 +37,10 @@
 			lg: 'w-10 h-10'
 		}
 	};
-
-	const STYLES = {
-		CONTAINER_BASE: 'bg-white rounded-lg flex items-center justify-center shadow-sm border border-gray-200',
-		WRAPPER: 'flex items-center space-x-3',
-		COMPANY_NAME: 'text-lg font-semibold text-gray-900',
-		TAGLINE: 'text-sm text-gray-500'
-	};
 </script>
 
-<div class={STYLES.WRAPPER}>
-	<div class="{SIZE_CLASSES.CONTAINER[size]} {STYLES.CONTAINER_BASE}">
+<div class="custom-bg flex items-center space-x-3">
+	<div class="{SIZE_CLASSES.CONTAINER[size]} bg-white rounded-lg flex items-center justify-center shadow-sm border border-gray-200">
 		<img 
 			src={LOGO_CONFIG.IMAGE_PATH} 
 			alt={CONTENT_TEXT.ALT_TEXT} 
@@ -56,8 +49,8 @@
 	</div>
 	{#if showText}
 		<div>
-			<h1 class={STYLES.COMPANY_NAME}>{companyName}</h1>
-			<p class={STYLES.TAGLINE}>{tagline}</p>
+			<h1 class="text-white text-lg font-semibold text-gray-900">{companyName}</h1>
+			<p class="text-white text-sm text-gray-500">{tagline}</p>
 		</div>
 	{/if}
 </div>

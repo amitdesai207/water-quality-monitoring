@@ -40,7 +40,7 @@
 	};
 </script>
 
-<div class="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100">
+<div class="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
 	<!-- Header -->
 	<Header 
 		{title}

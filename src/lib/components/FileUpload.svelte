@@ -268,7 +268,7 @@
 	}
 </script>
 
-<div class="w-full max-w-2xl mx-auto">
+<div class="w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
 	<!-- Upload Area -->
 	<div
 		class="relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 {selectedFile
