@@ -1,2 +1,29 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
+
+/* DataTable Component Styles */
+.datatable-container {
+	width: 100%;
+}
+
+.datatable-wrapper {
+	background-color: white;
+}
+
+/* Custom scrollbar for table */
+.datatable-wrapper::-webkit-scrollbar {
+	height: 8px;
+}
+
+.datatable-wrapper::-webkit-scrollbar-track {
+	background-color: #f3f4f6;
+}
+
+.datatable-wrapper::-webkit-scrollbar-thumb {
+	background-color: #9ca3af;
+	border-radius: 0.25rem;
+}
+
+.datatable-wrapper::-webkit-scrollbar-thumb:hover {
+	background-color: #6b7280;
+}
