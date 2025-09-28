@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { FileUploadProps } from '$lib/types';
+	import { ERROR_MESSAGES } from '$lib/constants/error-messages';
 
 	let { 
 		onfileprocessed = () => {}, 
@@ -14,15 +15,8 @@
 	let retryCount = $state(0);
 	let lastError = $state<Error | null>(null);
 
-	// Constants for messages and validation
-	const MESSAGES = {
-		INVALID_FILE_TYPE: 'Please select a CSV file.',
-		FILE_TOO_LARGE: 'File size must be less than 10MB.',
-		UNKNOWN_ERROR: 'Unknown error occurred',
-		PROCESSING_FAILED: 'Failed to process file',
-		SERVER_ERROR: 'Server error. Please try again later.',
-		VALIDATION_ERROR: 'File validation failed',
-		PROCESSING_STATUS: 'Processing CSV file...',
+	// Content text constants
+	const CONTENT_TEXT = {
 		FILE_SELECTED: 'File Selected',
 		SELECT_CSV_FILE: 'Select CSV File',
 		CLICK_TO_BROWSE: 'Click here to browse and select your CSV file',
@@ -35,8 +29,11 @@
 		CHARACTERISTIC_NAME_DESC: 'CharacteristicName: Must include "Temperature, water" entries',
 		RESULT_VALUE_DESC: 'ResultValue: Numeric temperature values',
 		RETRY_BUTTON: 'Retry',
+		PROCESSING_STATUS: 'Processing CSV file...',
+		DISMISS_BUTTON: 'Dismiss',
 		ERROR_TITLE: 'Upload Error'
 	};
+
 
 	const VALIDATION = {
 		MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
@@ -53,13 +50,12 @@
 	function validateFile(file: File): { isValid: boolean; error?: string } {
 		// Check file extension
 		if (!file.name.toLowerCase().endsWith(VALIDATION.ALLOWED_EXTENSION)) {
-			return { isValid: false, error: MESSAGES.INVALID_FILE_TYPE };
+			return { isValid: false, error: ERROR_MESSAGES.INVALID_FILE_TYPE };
 		}
 
 		// Check file size
-
 		if (file.size > VALIDATION.MAX_FILE_SIZE) {
-			return { isValid: false, error: MESSAGES.FILE_TOO_LARGE };
+			return { isValid: false, error: ERROR_MESSAGES.FILE_TOO_LARGE };
 		}
 
 		return { isValid: true };
@@ -107,7 +103,7 @@
 	 * @returns {string} Error message
 	 */
 	function getErrorMessage(err: unknown): string {
-		return err instanceof Error ? err.message : MESSAGES.UNKNOWN_ERROR;
+		return err instanceof Error ? err.message : ERROR_MESSAGES.UNKNOWN_ERROR;
 	}
 
 	/**
@@ -133,7 +129,7 @@
 	 * @returns {Promise<string>} Error message
 	 */
 	async function handleApiResponse(response: Response): Promise<string> {
-		let errorMessage = MESSAGES.PROCESSING_FAILED;
+		let errorMessage: string = ERROR_MESSAGES.PROCESSING_FAILED;
 		
 		try {
 			const errorData = await response.json();
@@ -141,16 +137,17 @@
 		} catch {
 			// If we can't parse the error response, use status-based messages
 			if (response.status >= 500) {
-				errorMessage = MESSAGES.SERVER_ERROR;
+				errorMessage = ERROR_MESSAGES.SERVER_ERROR;
 			} else if (response.status === 413) {
-				errorMessage = MESSAGES.FILE_TOO_LARGE;
+				errorMessage = ERROR_MESSAGES.FILE_TOO_LARGE;
 			} else if (response.status === 400) {
-				errorMessage = MESSAGES.VALIDATION_ERROR;
+				errorMessage = ERROR_MESSAGES.VALIDATION_ERROR;
 			}
 		}
 		
 		return errorMessage;
 	}
+    
 
 	/**
 	 * Resets form state after successful processing
@@ -283,7 +280,7 @@
 					</svg>
 				</div>
 				<div>
-					<h3 class="text-lg font-medium text-gray-900">{MESSAGES.FILE_SELECTED}</h3>
+					<h3 class="text-lg font-medium text-gray-900">{CONTENT_TEXT.FILE_SELECTED}</h3>
 					<p class="text-sm text-gray-600 mt-1">{selectedFile.name}</p>
 					<p class="text-xs text-gray-500 mt-1">
 						{(selectedFile.size / 1024).toFixed(1)} KB
@@ -299,12 +296,12 @@
 					</svg>
 				</div>
 				<div>
-					<h3 class="text-lg font-medium text-gray-900">{MESSAGES.SELECT_CSV_FILE}</h3>
+					<h3 class="text-lg font-medium text-gray-900">{CONTENT_TEXT.SELECT_CSV_FILE}</h3>
 					<p class="text-sm text-gray-600 mt-1">
-						{MESSAGES.CLICK_TO_BROWSE}
+						{CONTENT_TEXT.CLICK_TO_BROWSE}
 					</p>
 					<p class="text-xs text-gray-500 mt-2">
-						{MESSAGES.FILE_SUPPORT_INFO}
+						{CONTENT_TEXT.FILE_SUPPORT_INFO}
 					</p>
 				</div>
 			</div>
@@ -321,7 +318,7 @@
 					</svg>
 				</div>
 				<div class="ml-3 flex-1">
-					<h3 class="text-sm font-medium text-red-800">{MESSAGES.ERROR_TITLE}</h3>
+					<h3 class="text-sm font-medium text-red-800">{CONTENT_TEXT.ERROR_TITLE}</h3>
 					<p class="text-sm text-red-700 mt-1">{error}</p>
 					{#if retryCount < 3}
 						<div class="mt-3 flex space-x-3">
@@ -330,13 +327,13 @@
 								disabled={isProcessing}
 								class="text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
 							>
-								{MESSAGES.RETRY_BUTTON} ({retryCount}/3)
+								{CONTENT_TEXT.RETRY_BUTTON} ({retryCount}/3)
 							</button>
 							<button
 								onclick={clearError}
 								class="text-sm font-medium text-red-600 hover:text-red-500"
 							>
-								Dismiss
+								{CONTENT_TEXT.DISMISS_BUTTON}
 							</button>
 						</div>
 					{/if}
@@ -354,7 +351,7 @@
 				onclick={clearFile}
 				disabled={isProcessing}
 			>
-				{MESSAGES.CLEAR_BUTTON}
+				{CONTENT_TEXT.CLEAR_BUTTON}
 			</button>
 			<button
 				type="button"
@@ -367,9 +364,9 @@
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 					</svg>
-					{MESSAGES.PROCESSING_BUTTON}
+					{CONTENT_TEXT.PROCESSING_BUTTON}
 				{:else}
-					{MESSAGES.PROCESS_FILE_BUTTON}
+					{CONTENT_TEXT.PROCESS_FILE_BUTTON}
 				{/if}
 			</button>
 		</div>
@@ -383,18 +380,18 @@
 					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 				</svg>
-				<span class="text-blue-700 font-medium">{MESSAGES.PROCESSING_STATUS}</span>
+				<span class="text-blue-700 font-medium">{CONTENT_TEXT.PROCESSING_STATUS}</span>
 			</div>
 		</div>
 	{/if}
 
 	<!-- Instructions -->
 	<div class="mt-8 text-sm text-gray-500 space-y-2">
-		<h4 class="font-medium text-gray-700">{MESSAGES.EXPECTED_FORMAT}</h4>
+		<h4 class="font-medium text-gray-700">{CONTENT_TEXT.EXPECTED_FORMAT}</h4>
 		<ul class="list-disc list-inside space-y-1 ml-4">
-			<li><strong>{MESSAGES.MONITORING_LOCATION_DESC}</strong></li>
-			<li><strong>{MESSAGES.CHARACTERISTIC_NAME_DESC}</strong></li>
-			<li><strong>{MESSAGES.RESULT_VALUE_DESC}</strong></li>
+			<li><strong>{CONTENT_TEXT.MONITORING_LOCATION_DESC}</strong></li>
+			<li><strong>{CONTENT_TEXT.CHARACTERISTIC_NAME_DESC}</strong></li>
+			<li><strong>{CONTENT_TEXT.RESULT_VALUE_DESC}</strong></li>
 		</ul>
 	</div>
 </div>

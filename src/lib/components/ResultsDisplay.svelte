@@ -13,8 +13,8 @@
 	let values = $derived(Object.values(results));
 	let stats = $derived(calculateStats(values));
 
-	// Constants for page content and labels
-	const CONTENT = {
+	// Content text constants
+	const CONTENT_TEXT = {
 		RESULTS_TITLE: 'Temperature Analysis Results',
 		SEARCH_PLACEHOLDER: 'Search locations...',
 		LOCATION_HEADER: 'Monitoring Location',
@@ -119,9 +119,9 @@
 <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200">
 	<!-- Header -->
 	<div class="px-6 py-4 border-b border-gray-200">
-		<h2 class="text-xl font-semibold text-gray-900">{CONTENT.RESULTS_TITLE}</h2>
+		<h2 class="text-xl font-semibold text-gray-900">{CONTENT_TEXT.RESULTS_TITLE}</h2>
 		<p class="text-sm text-gray-600 mt-1">
-			{CONTENT.FOUND_DATA_MESSAGE(totalLocations)}
+			{CONTENT_TEXT.FOUND_DATA_MESSAGE(totalLocations)}
 		</p>
 	</div>
 
@@ -129,20 +129,20 @@
 	<div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
 		<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 			<div class="bg-white p-4 rounded-lg border">
-				<div class="text-sm font-medium text-gray-500">{CONTENT.TOTAL_LOCATIONS}</div>
+				<div class="text-sm font-medium text-gray-500">{CONTENT_TEXT.TOTAL_LOCATIONS}</div>
 				<div class="text-2xl font-bold text-gray-900">{totalLocations}</div>
 			</div>
 			<div class="bg-white p-4 rounded-lg border">
-				<div class="text-sm font-medium text-gray-500">{CONTENT.AVERAGE_TEMPERATURE}</div>
-				<div class="text-2xl font-bold text-blue-600">{stats.average.toFixed(1)}{CONTENT.TEMPERATURE_UNIT}</div>
+				<div class="text-sm font-medium text-gray-500">{CONTENT_TEXT.AVERAGE_TEMPERATURE}</div>
+				<div class="text-2xl font-bold text-blue-600">{stats.average.toFixed(1)}{CONTENT_TEXT.TEMPERATURE_UNIT}</div>
 			</div>
 			<div class="bg-white p-4 rounded-lg border">
-				<div class="text-sm font-medium text-gray-500">{CONTENT.MIN_TEMPERATURE}</div>
-				<div class="text-2xl font-bold text-green-600">{stats.min.toFixed(1)}{CONTENT.TEMPERATURE_UNIT}</div>
+				<div class="text-sm font-medium text-gray-500">{CONTENT_TEXT.MIN_TEMPERATURE}</div>
+				<div class="text-2xl font-bold text-green-600">{stats.min.toFixed(1)}{CONTENT_TEXT.TEMPERATURE_UNIT}</div>
 			</div>
 			<div class="bg-white p-4 rounded-lg border">
-				<div class="text-sm font-medium text-gray-500">{CONTENT.MAX_TEMPERATURE}</div>
-				<div class="text-2xl font-bold text-red-600">{stats.max.toFixed(1)}{CONTENT.TEMPERATURE_UNIT}</div>
+				<div class="text-sm font-medium text-gray-500">{CONTENT_TEXT.MAX_TEMPERATURE}</div>
+				<div class="text-2xl font-bold text-red-600">{stats.max.toFixed(1)}{CONTENT_TEXT.TEMPERATURE_UNIT}</div>
 			</div>
 		</div>
 	</div>
@@ -153,7 +153,7 @@
 		<div class="relative">
 			<input
 				type="text"
-				placeholder={CONTENT.SEARCH_PLACEHOLDER}
+				placeholder={CONTENT_TEXT.SEARCH_PLACEHOLDER}
 				bind:value={searchTerm}
 				class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 			/>
@@ -166,18 +166,18 @@
 	<!-- Temperature Legend -->
 	<div class="px-6 py-3 bg-gray-50 border-b border-gray-200">
 		<div class="flex items-center space-x-6 text-sm">
-			<span class="text-gray-600 font-medium">{CONTENT.LEGEND_TITLE}</span>
+			<span class="text-gray-600 font-medium">{CONTENT_TEXT.LEGEND_TITLE}</span>
 			<div class="flex items-center space-x-2">
 				<div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-				<span class="text-gray-600">{CONTENT.LEGEND_COLD} (&lt; {TEMPERATURE_RANGES.COLD_THRESHOLD}°C)</span>
+				<span class="text-gray-600">{CONTENT_TEXT.LEGEND_COLD} (&lt; {TEMPERATURE_RANGES.COLD_THRESHOLD}°C)</span>
 			</div>
 			<div class="flex items-center space-x-2">
 				<div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-				<span class="text-gray-600">{CONTENT.LEGEND_MODERATE} ({TEMPERATURE_RANGES.COLD_THRESHOLD}-{TEMPERATURE_RANGES.WARM_THRESHOLD}°C)</span>
+				<span class="text-gray-600">{CONTENT_TEXT.LEGEND_MODERATE} ({TEMPERATURE_RANGES.COLD_THRESHOLD}-{TEMPERATURE_RANGES.WARM_THRESHOLD}°C)</span>
 			</div>
 			<div class="flex items-center space-x-2">
 				<div class="w-3 h-3 bg-red-500 rounded-full"></div>
-				<span class="text-gray-600">{CONTENT.LEGEND_WARM} (&gt; {TEMPERATURE_RANGES.WARM_THRESHOLD}°C)</span>
+				<span class="text-gray-600">{CONTENT_TEXT.LEGEND_WARM} (&gt; {TEMPERATURE_RANGES.WARM_THRESHOLD}°C)</span>
 			</div>
 		</div>
 	</div>
@@ -192,7 +192,7 @@
 						onclick={() => toggleSort('location')}
 					>
 						<div class="flex items-center space-x-1">
-							<span>{CONTENT.LOCATION_HEADER}</span>
+							<span>{CONTENT_TEXT.LOCATION_HEADER}</span>
 							{#if sortField === 'location'}
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									{#if sortDirection === 'asc'}
@@ -209,7 +209,7 @@
 						onclick={() => toggleSort('temperature')}
 					>
 						<div class="flex items-center space-x-1">
-							<span>{CONTENT.TEMPERATURE_HEADER}</span>
+							<span>{CONTENT_TEXT.TEMPERATURE_HEADER}</span>
 							{#if sortField === 'temperature'}
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									{#if sortDirection === 'asc'}
@@ -222,7 +222,7 @@
 						</div>
 					</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-						{CONTENT.VISUALIZATION_HEADER}
+						{CONTENT_TEXT.VISUALIZATION_HEADER}
 					</th>
 				</tr>
 			</thead>
@@ -234,7 +234,7 @@
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap">
 							<span class="text-sm font-medium text-gray-900">
-								{temperature.toFixed(1)}{CONTENT.TEMPERATURE_UNIT}
+								{temperature.toFixed(1)}{CONTENT_TEXT.TEMPERATURE_UNIT}
 							</span>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
@@ -250,7 +250,7 @@
 									></div>
 								</div>
 								<span class="ml-2 text-xs text-gray-500">
-									{((temperature - stats.min) / (stats.max - stats.min) * 100).toFixed(0)}{CONTENT.PERCENTAGE_SUFFIX}
+									{((temperature - stats.min) / (stats.max - stats.min) * 100).toFixed(0)}{CONTENT_TEXT.PERCENTAGE_SUFFIX}
 								</span>
 							</div>
 						</td>
@@ -258,7 +258,7 @@
 				{:else}
 					<tr>
 						<td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
-							{CONTENT.NO_RESULTS}
+							{CONTENT_TEXT.NO_RESULTS}
 						</td>
 					</tr>
 				{/each}

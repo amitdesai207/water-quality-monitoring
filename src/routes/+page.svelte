@@ -4,15 +4,16 @@
 	import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
 	import PageLayout from '$lib/components/layout/PageLayout.svelte';
 	import type { TemperatureData } from '$lib/types';
+	import { ERROR_MESSAGES } from '$lib/constants/error-messages';
 
-	// Constants for page content
-	const PAGE_MESSAGES = {
+	// Content text constants
+	const CONTENT_TEXT = {
 		TITLE: 'Water Quality Monitoring',
 		DESCRIPTION: 'Process water quality CSV files and calculate temperature averages by monitoring location',
 		SUBTITLE: 'Upload CSV files to calculate average water temperature by monitoring location. Perfect for environmental data analysis and reporting.',
-		PROCESSING_ERROR_TITLE: 'Processing Error',
-		ERROR_BOUNDARY_CAUGHT_ERROR: 'Error boundary caught error:'
+		PROCESSING_ERROR_TITLE: 'Processing Error'
 	};
+
 	
 	let results = $state<TemperatureData | null>(null);
 	let error = $state<string | null>(null);
@@ -50,7 +51,7 @@
 	 * @param errorInfo - Additional error information
 	 */
 	function handleErrorBoundaryError(err: Error, errorInfo: any) {
-		console.error(PAGE_MESSAGES.ERROR_BOUNDARY_CAUGHT_ERROR, err, errorInfo);
+		console.error(ERROR_MESSAGES.ERROR_BOUNDARY_CAUGHT_ERROR, err, errorInfo);
 	}
 
 	/**
@@ -63,13 +64,13 @@
 </script>
 
 <svelte:head>
-	<title>{PAGE_MESSAGES.TITLE}</title>
-	<meta name="description" content="{PAGE_MESSAGES.DESCRIPTION}" />
+	<title>{CONTENT_TEXT.TITLE}</title>
+	<meta name="description" content="{CONTENT_TEXT.DESCRIPTION}" />
 </svelte:head>
 
 <PageLayout 
-	title={PAGE_MESSAGES.TITLE}
-	subtitle={PAGE_MESSAGES.SUBTITLE}
+	title={CONTENT_TEXT.TITLE}
+	subtitle={CONTENT_TEXT.SUBTITLE}
 	maxWidth="xl"
 >
 	{#snippet children()}
@@ -95,7 +96,7 @@
 								</svg>
 							</div>
 							<div class="ml-3">
-								<h3 class="text-sm font-medium text-red-800">{PAGE_MESSAGES.PROCESSING_ERROR_TITLE}</h3>
+								<h3 class="text-sm font-medium text-red-800">{CONTENT_TEXT.PROCESSING_ERROR_TITLE}</h3>
 								<p class="text-sm text-red-700 mt-1">{error}</p>
 							</div>
 						</div>

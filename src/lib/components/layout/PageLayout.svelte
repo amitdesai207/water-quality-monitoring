@@ -13,19 +13,19 @@
 		children?: Snippet;
 	}
 
-	// Constants for default values
-	const DEFAULT_VALUES = {
+	// Content text constants
+	const CONTENT_TEXT = {
 		TITLE: "Water Quality Monitoring",
 		SUBTITLE: "Upload CSV files to calculate average water temperature by monitoring location.",
 		VERSION: "1.0.0"
 	};
 
 	let { 
-		title = DEFAULT_VALUES.TITLE,
-		subtitle = DEFAULT_VALUES.SUBTITLE,
+		title = CONTENT_TEXT.TITLE,
+		subtitle = CONTENT_TEXT.SUBTITLE,
 		showLogo = true,
 		showSystemInfo = true,
-		version = DEFAULT_VALUES.VERSION,
+		version = CONTENT_TEXT.VERSION,
 		maxWidth = 'xl',
 		children
 	}: Props = $props();

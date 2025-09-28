@@ -2,21 +2,8 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import type { TemperatureData } from '$lib/types';
 import neatCsv from 'neat-csv';
+import { ERROR_MESSAGES } from '$lib/constants/error-messages';
 
-// Constants for error messages and validation
-const ERROR_MESSAGES = {
-	NO_FILE_PROVIDED: 'No CSV file provided',
-	INVALID_FILE_TYPE: 'File must be a CSV file',
-	FILE_TOO_LARGE: 'File size must be less than 10MB',
-	EMPTY_FILE: 'CSV file is empty',
-	INSUFFICIENT_DATA: 'CSV file must contain at least a header row and one data row',
-	MISSING_REQUIRED_COLUMNS: 'CSV must contain required columns',
-	NO_TEMPERATURE_DATA: 'No temperature data found. Please ensure your CSV contains rows with CharacteristicName="Temperature, water" and valid ResultValue numbers.',
-	NO_VALID_DATA: 'No valid temperature data found in the CSV file',
-	PROCESSING_ERROR: 'Unknown error occurred while processing CSV',
-	CSV_PARSING_FAILED: 'CSV parsing failed',
-	INVALID_REQUEST: 'Invalid request format'
-};
 
 const LOG_MESSAGES = {
 	PROCESSING_STATS: 'Processed {rows} rows, found {temperatureRows} temperature measurements for {locations} locations',
@@ -232,7 +219,7 @@ async function readAndValidateCsvContent(csvFile: File): Promise<string> {
 	try {
 		csvContent = await csvFile.text();
 	} catch (err) {
-		throw error(400, { message: 'Failed to read file content' });
+		throw error(400, { message: ERROR_MESSAGES.FILE_READ_ERROR });
 	}
 
 	const fileValidation = validateFileBasics(csvFile, csvContent);

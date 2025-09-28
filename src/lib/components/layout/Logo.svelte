@@ -6,20 +6,24 @@
 		tagline?: string;
 	}
 
+	// Content text constants
+	const CONTENT_TEXT = {
+		DEFAULT_COMPANY: 'AquaLab',
+		DEFAULT_TAGLINE: 'Temperature Analysis Tool',
+		ALT_TEXT: 'Water Quality Logo'
+	};
+
+	// Configuration constants
+	const LOGO_CONFIG = {
+		IMAGE_PATH: '/logo.svg'
+	};
+
 	let { 
 		size = 'md',
 		showText = true,
-		companyName = "AquaLab",
-		tagline = "Temperature Analysis Tool"
+		companyName = CONTENT_TEXT.DEFAULT_COMPANY,
+		tagline = CONTENT_TEXT.DEFAULT_TAGLINE
 	}: Props = $props();
-
-	// Constants for logo configuration
-	const LOGO_CONFIG = {
-		IMAGE_PATH: '/logo.svg',
-		ALT_TEXT: 'Water Quality Logo',
-		DEFAULT_COMPANY: 'AquaLab',
-		DEFAULT_TAGLINE: 'Temperature Analysis Tool'
-	};
 
 	const SIZE_CLASSES = {
 		CONTAINER: {
@@ -46,7 +50,7 @@
 	<div class="{SIZE_CLASSES.CONTAINER[size]} {STYLES.CONTAINER_BASE}">
 		<img 
 			src={LOGO_CONFIG.IMAGE_PATH} 
-			alt={LOGO_CONFIG.ALT_TEXT} 
+			alt={CONTENT_TEXT.ALT_TEXT} 
 			class={SIZE_CLASSES.IMAGE[size]} 
 		/>
 	</div>

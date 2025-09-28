@@ -7,15 +7,15 @@
 		showLogo?: boolean;
 	}
 
-	// Constants for default values
-	const DEFAULT_VALUES = {
+	// Content text constants
+	const CONTENT_TEXT = {
 		TITLE: "Water Quality Monitoring",
 		SUBTITLE: "Upload CSV files to calculate average water temperature by monitoring location."
 	};
 
 	let { 
-		title = DEFAULT_VALUES.TITLE,
-		subtitle = DEFAULT_VALUES.SUBTITLE,
+		title = CONTENT_TEXT.TITLE,
+		subtitle = CONTENT_TEXT.SUBTITLE,
 		showLogo = true
 	}: Props = $props();
 </script>

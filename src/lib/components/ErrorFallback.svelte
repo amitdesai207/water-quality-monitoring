@@ -1,18 +1,18 @@
 <script lang="ts">
 	import type { ErrorFallbackProps } from '$lib/types/index.js';
 
-	// Constants for fallback content
-	const FALLBACK_CONTENT = {
+	// Content text constants
+	const CONTENT_TEXT = {
 		TITLE: 'Something went wrong',
 		MESSAGE: 'An unexpected error occurred. Please try again or contact support if the problem persists.',
 		RETRY_BUTTON: 'Try Again',
 		RELOAD_BUTTON: 'Reload Page',
-		CONTACT_SUPPORT: 'Contact Support'
+		CONTACT_SUPPORT: 'If this problem persists, please contact support'
 	};
 
 	let { 
-		title = FALLBACK_CONTENT.TITLE,
-		message = FALLBACK_CONTENT.MESSAGE,
+		title = CONTENT_TEXT.TITLE,
+		message = CONTENT_TEXT.MESSAGE,
 		onRetry,
 		children
 	}: ErrorFallbackProps = $props();
@@ -59,7 +59,7 @@
 					<svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 					</svg>
-					{FALLBACK_CONTENT.RETRY_BUTTON}
+					{CONTENT_TEXT.RETRY_BUTTON}
 				</button>
 			{/if}
 			
@@ -70,14 +70,14 @@
 				<svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 				</svg>
-				{FALLBACK_CONTENT.RELOAD_BUTTON}
+				{CONTENT_TEXT.RELOAD_BUTTON}
 			</button>
 		</div>
 
 		<!-- Support Information -->
 		<div class="text-center">
 			<p class="text-xs text-gray-500">
-				If this problem persists, please {FALLBACK_CONTENT.CONTACT_SUPPORT}
+				{CONTENT_TEXT.CONTACT_SUPPORT}
 			</p>
 		</div>
 

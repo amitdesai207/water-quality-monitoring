@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { onMount } from 'svelte';	
+	import { onMount } from 'svelte';
 	import ErrorFallback from './ErrorFallback.svelte';
+	import { ERROR_MESSAGES } from '$lib/constants/error-messages';
 
 	import type { ErrorBoundaryProps } from '$lib/types/index.js';
 
-	// Constants for error boundary content
-	const ERROR_CONTENT = {
+	// Content text constants
+	const CONTENT_TEXT = {
 		DEFAULT_TITLE: 'Something went wrong',
-		DEFAULT_MESSAGE: 'An unexpected error occurred. Please try again or contact support if the problem persists.',
-        UNHANDLED_REJECTION: 'Unhandled promise rejection:',
-        UNCAUGHT_ERROR: 'Uncaught error:',
-        ERROR_BOUNDARY_CAUGHT_ERROR: 'ErrorBoundary caught an error:'
+		DEFAULT_MESSAGE: 'An unexpected error occurred. Please try again or contact support if the problem persists.'
 	};
+
 
     const ERROR_TYPES = {
         UNHANDLED_REJECTION: 'unhandledRejection',
@@ -22,8 +21,8 @@
 		children,
 		fallback,
 		onError,
-		title = ERROR_CONTENT.DEFAULT_TITLE,
-		message = ERROR_CONTENT.DEFAULT_MESSAGE,
+		title = CONTENT_TEXT.DEFAULT_TITLE,
+		message = CONTENT_TEXT.DEFAULT_MESSAGE,
 		onRetry
 	}: ErrorBoundaryProps = $props();
 
@@ -45,7 +44,7 @@
 		error = err;
 		errorInfo = info;
 		
-		console.error(ERROR_CONTENT.ERROR_BOUNDARY_CAUGHT_ERROR, {
+		console.error(ERROR_MESSAGES.ERROR_BOUNDARY_CAUGHT_ERROR, {
 			message: err.message,
 			stack: err.stack,
 			componentStack: info?.componentStack,
@@ -94,7 +93,7 @@
 	 * @returns {void}
 	 */
 	function handleUnhandledRejection(event: PromiseRejectionEvent) {
-		console.error(ERROR_CONTENT.UNHANDLED_REJECTION, event.reason);
+		console.error(ERROR_MESSAGES.UNHANDLED_REJECTION, event.reason);
 		handleError(new Error(event.reason), { type: ERROR_TYPES.UNHANDLED_REJECTION });
 	}
 
@@ -107,7 +106,7 @@
 	 * @returns {void}
 	 */
 	function handleErrorEvent(event: ErrorEvent) {
-		console.error(ERROR_CONTENT.UNCAUGHT_ERROR, event.error);
+		console.error(ERROR_MESSAGES.UNCAUGHT_ERROR, event.error);
 		handleError(event.error, { type: ERROR_TYPES.UNCAUGHT_ERROR });
 	}
 
