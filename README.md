@@ -77,6 +77,8 @@ npm run test:watch
 3. Built results display component
 4. Add comprehensive error handling
 
+**DEMO video (Phase 1)**
+https://github.com/amitdesai207/water-quality-monitoring/blob/main/Demo.webm
 
 **Phase 2 (Enhancement)**:
 1. Add asynchronous processing via AWS S3, SQS and Lambda
