@@ -12,7 +12,62 @@ A SvelteKit application for processing water quality data from CSV files, specif
 - Calculate average "ResultValue" for each "MonitoringLocationID"
 - Display results in a user-friendly interface
 
-### **Architecture Strategy**
+
+## Component Documentation
+
+### **Core Components**
+
+#### **📄 FileUpload.svelte**
+- **Purpose**: Handles CSV file selection and validation
+- **Dependencies**: None
+
+#### **📄 ResultsDisplay.svelte**
+- **Purpose**: Displays processed temperature data and statistics
+- **Dependencies**: DataTable.svelte
+
+#### **📄 DataTable.svelte**
+- **Purpose**: Interactive table for displaying temperature results
+- **Dependencies**: None
+
+### **Layout Components**
+
+#### **📄 PageLayout.svelte**
+- **Purpose**: Main page wrapper with consistent layout
+- **Dependencies**: Header.svelte, Footer.svelte
+
+#### **📄 Header.svelte**
+- **Purpose**: Page header with title and navigation
+- **Dependencies**: Logo.svelte
+
+#### **📄 Footer.svelte**
+- **Purpose**: Page footer with system information
+- **Dependencies**: BottomBar.svelte
+
+#### **📄 Logo.svelte**
+- **Purpose**: Company logo and application name
+- **Dependencies**: Logo.svelte
+
+#### **📄 BottomBar.svelte**
+- **Purpose**: Copyright and version
+- **Dependencies**: BottomBar.svelte
+
+### **Error Handling Components**
+
+#### **📄 ErrorBoundary.svelte**
+- **Purpose**: Catches and handles application errors
+- **Dependencies**: ErrorFallback.svelte
+
+#### **📄 ErrorFallback.svelte**
+- **Purpose**: Displays error messages and recovery options
+- **Dependencies**: None
+
+## API Documentation
+
+### **📄 +server.ts**
+- **Purpose**: Main API endpoint for CSV processing
+- **Dependencies**: neat-csv, error-messages.ts
+
+## **Architecture Strategy**
 
 ### **Local Prototype (Current)**
 ```
